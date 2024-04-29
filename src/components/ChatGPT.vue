@@ -19,7 +19,6 @@
 import ChatBox from "./ChatBox.vue";
 import ChatGPTMessage from "./ChatGPTMessage.vue";
 import MessageBox from "./MessageBox.vue";
-// import OpenAI from "openai";
 
 export default {
   name: "ChatGPT",
@@ -62,8 +61,7 @@ export default {
 
     // Fetch initial message from ChatGPT
     async callToApi() {
-      //   const apiKey = localStorage.getItem("chatGPTApiKey");
-      const apiKey = "sk-proj-ctWn8aQDt4QAvzu6qE0AT3BlbkFJ0znWnB0I3VJzve8Qgjxn";
+      const apiKey = "";
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
         {
