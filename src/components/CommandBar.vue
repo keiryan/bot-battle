@@ -9,10 +9,13 @@
     @click="handleClick($event)"
   >
     <div
-      class="flex flex-col mx-4 w-full max-w-2xl bg-[#0D0D0D] p-4 rounded-xl"
+      class="flex flex-col mx-4 w-full max-w-2xl bg-[#0D0D0D] p-4 rounded-xl border border-[#404040] shadow-lg"
     >
       <!-- Search Bar -->
-      <div class="flex w-full gap-2 bg-[#060606FF] p-2 rounded-md mb-4">
+      <form
+        class="flex w-full gap-2 bg-[#060606FF] p-2 rounded-md mb-4"
+        @submit="submitSearchTerm"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -30,12 +33,17 @@
         <input
           type="text"
           class="bg-transparent outline-none border-none text-white w-full"
+          autocomplete="off"
+          v-model="search"
         />
-      </div>
-      <div class="text-[#FFFFFF7B] pl-1 text-lg mb-2">Settings</div>
-      <div class="flex items-center gap-4 pl-1 text-sm">
-        ChatGPT API Key
-        <div class="flex items-center h-8 pl-2 rounded flex-1" :class="editingAPIKey ? 'bg-[#060606FF]' : 'bg-[#151515FF]'">
+      </form>
+      <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">ChatGPT</div>
+      <!-- <div class="flex items-center gap-4 pl-1 text-sm mb-6">
+        API Key
+        <div
+          class="flex items-center h-8 pl-2 rounded flex-1"
+          :class="editingAPIKey ? 'bg-[#060606FF]' : 'bg-[#151515FF]'"
+        >
           <input
             type="password"
             class="w-full mr-2 bg-transparent outline-none border-none"
@@ -44,21 +52,33 @@
             v-if="editingAPIKey"
             ref="autoFocusInput"
           />
-          <div class="flex w-full items-center h-8 opacity-50 cursor-pointer" v-if="!editingAPIKey" @click="toggleEditingAPIKey">
-            {{ chatGPTApiKey.replace(/./g, '•') }}
+          <div
+            class="flex w-full items-center h-8 opacity-50 cursor-pointer"
+            v-if="!editingAPIKey"
+            @click="toggleEditingAPIKey"
+          >
+            {{ chatGPTApiKey.replace(/./g, "•") }}
           </div>
         </div>
-      </div>
+      </div> -->
+      <CommandBarListInput text="ChatGPT API Key" keyName="ChatGPTAPIKey" />
+      <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Gemini</div>
+      <CommandBarListInput text="Gemini API Key" keyName="GeminiAPIKey" />
     </div>
   </div>
 </template>
 
 <script>
+import CommandBarListInput from "./CommandBarListInput.vue";
 export default {
   name: "CommandBar",
   props: {
     active: Boolean,
     toggleCommandBar: Function,
+  },
+
+  components: {
+    CommandBarListInput,
   },
 
   methods: {
@@ -67,6 +87,10 @@ export default {
       if (event.target === event.currentTarget) {
         this.toggleCommandBar();
       }
+    },
+
+    submitSearchTerm() {
+      console.log(this.search);
     },
 
     toggleEditingAPIKey() {
@@ -84,6 +108,7 @@ export default {
       value: "",
       chatGPTApiKey: "this",
       editingAPIKey: false,
+      search: "",
     };
   },
 };

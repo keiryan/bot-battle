@@ -1,16 +1,21 @@
 <template>
-  <div class="message-container flex mb-2" :class="message.sender === 'user' && 'mb-8'">
+  <div
+    class="message-container flex mb-2"
+    :class="message.sender === 'user' && 'mb-8'"
+  >
     <!-- Profile Image -->
     <div
       class="border border-[#404040] rounded-full flex items-center justify-center h-6 w-6 mr-2"
-      :class="message.sender === 'user' ? 'p-0.5 bg-[#001C2B]' : 'p-1 bg-[#212121]'"
+      :class="
+        message.sender === 'user' ? 'p-0.5 bg-[#001C2B]' : 'p-1 bg-[#212121]'
+      "
     >
       <ProfileIcon :role="message.sender" />
     </div>
     <!-- Name and Message -->
     <div class="flex flex-col text-white">
       <div class="font-bold">
-        {{ message.sender === "user" ? "You" : "ChatGPT" }}
+        {{ senderLegend[message.sender] }}
       </div>
       <div v-html="renderedMarkdown" />
       <!-- Icon Array -->
@@ -51,6 +56,16 @@ export default {
     renderedMarkdown() {
       return marked(this.message.message);
     },
+  },
+
+  data() {
+    return {
+      senderLegend: {
+        user: "You",
+        'ai-chatgpt': "ChatGPT",
+        gemini: "Gemini",
+      },
+    };
   },
 };
 </script>
