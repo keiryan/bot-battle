@@ -1,6 +1,8 @@
 <template>
-  <div className="w-screen h-screen flex bg-red-500 relative">
+  <div className="w-screen h-screen flex relative">
     <ChatGPT />
+    <!-- Visual divider -->
+    <div class="w-2 h-full bg-black" />
     <Gemini />
     <CommandBar :active="commandBarActive" :toggleCommandBar="toggleCommandBar" />
   </div>
@@ -8,8 +10,8 @@
 
 <script>
 import ChatGPT from "./components/ChatGPT.vue";
-import Gemini from "./components/Gemini.vue";
 import CommandBar from "./components/CommandBar.vue";
+import Gemini from "./components/Gemini.vue";
 
 export default {
   name: "App",
@@ -36,8 +38,6 @@ export default {
       }
     },
     toggleCommandBar() {
-      console.log("Feature activated!");
-      // Here you would put whatever you want to happen when Ctrl+Space is pressed
       this.commandBarActive = !this.commandBarActive;
     },
   },

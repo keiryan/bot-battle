@@ -61,7 +61,7 @@ export default {
 
     // Fetch initial message from ChatGPT
     async callToApi() {
-      const apiKey = "";
+      const apiKey = localStorage.getItem('ChatGPTAPIKey');
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
         {
