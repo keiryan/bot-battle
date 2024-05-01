@@ -2,7 +2,7 @@
   <div className="w-screen h-screen flex bg-red-500 relative">
     <ChatGPT />
     <Gemini />
-    <CommandBar :active="commandBarActive" />
+    <CommandBar :active="commandBarActive" :toggleCommandBar="toggleCommandBar" />
   </div>
 </template>
 
