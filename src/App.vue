@@ -31,8 +31,9 @@ export default {
 
   methods: {
     handleKeyDown(event) {
-      if (event.ctrlKey && event.key === " ") {
-        // ' ' for Spacebar
+      if (event.metaKey && event.key === "k") {
+        // Command + K
+
         event.preventDefault();
         this.toggleCommandBar();
       }
