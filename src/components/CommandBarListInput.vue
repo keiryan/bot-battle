@@ -6,7 +6,7 @@
       :class="editing ? 'bg-[#060606FF]' : 'bg-[#151515FF]'"
     >
       <input
-        type="password"
+        :type="TypeLegend[type] || 'text'"
         class="w-full mr-2 bg-transparent outline-none border-none"
         v-model="value"
         @blur="toggleEditing"
@@ -18,7 +18,7 @@
         v-if="!editing"
         @click="toggleEditing"
       >
-        {{ value.replace(/./g, "•") }}
+        {{ type === "sensitive" ? value.replace(/./g, "•") : value }}
       </div>
     </div>
   </div>
@@ -32,6 +32,7 @@ export default {
     toggleCommandBar: Function,
     text: String,
     keyName: String,
+    type: String,
   },
 
   mounted() {
@@ -62,6 +63,10 @@ export default {
     return {
       value: "",
       editing: false,
+      TypeLegend: {
+        sensitive: "password",
+        text: "text",
+      },
     };
   },
 };

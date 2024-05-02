@@ -91,11 +91,13 @@ export default {
 
   methods: {
     onSubmit(e) {
-      const textarea = this.$el.querySelector("textarea");
-      textarea.style.height = "1.5rem"; // Reset height
-      e.preventDefault();
-      this.submitEvent(this.message);
-      this.message = "";
+      if (this.message.length > 0) {
+        const textarea = this.$el.querySelector("textarea");
+        textarea.style.height = "1.5rem"; // Reset height
+        e.preventDefault();
+        this.submitEvent(this.message);
+        this.message = "";
+      }
     },
 
     handleEnterKey(e) {
@@ -110,24 +112,22 @@ export default {
 </script>
 
 <style>
-
 /* Targeting the specific element with a unique class */
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent; /* Makes the track invisible */
+  background: transparent; /* Makes the track invisible */
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #383838; /* Visible thumb with a specific color */
-    border-radius: 10px; /* Rounded corners for the thumb */
+  background-color: #383838; /* Visible thumb with a specific color */
+  border-radius: 10px; /* Rounded corners for the thumb */
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 8px; /* Width of the scrollbar, making sure the thumb is visible */
+  width: 8px; /* Width of the scrollbar, making sure the thumb is visible */
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: #4B4B4B; /* Change color on hover */
-    cursor: pointer;
+  background-color: #4b4b4b; /* Change color on hover */
+  cursor: pointer;
 }
-
 </style>

@@ -36,7 +36,6 @@ export default {
     },
 
     chatSubmission(message, user) {
-      console.count("chatSubmission");
       this.messages.push({
         id: this.messages.length + 1,
         message: message,
@@ -78,7 +77,6 @@ export default {
       const result = await chat.sendMessage(message);
       const response = result.response;
       this.chatSubmission(response.text(), "gemini");
-      console.log(response.text());
     },
   },
 

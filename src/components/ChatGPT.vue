@@ -33,7 +33,6 @@ export default {
 
   methods: {
     onSubmit(message) {
-      console.log("Message submitted: ", message);
       this.chatSubmission(message, "user");
       this.callToApi();
     },
