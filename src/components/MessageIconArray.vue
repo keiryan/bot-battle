@@ -61,8 +61,11 @@ export default {
     const audioPlayer = ref(null);
 
     const handleAudioFetch = async (text) => {
-      const API_KEY = localStorage.getItem('ElevenLabsAPIKey') || '';
-      const VOICE_ID = localStorage.getItem('GeminiVoice') || ''; // The voice ID you're using
+      const API_KEY = localStorage.getItem("ElevenLabsAPIKey") || "";
+      const VOICE_ID =
+        localStorage.getItem(
+          `${props.message.sender === "gemini" ? "GeminiVoice" : "ChatGPTVoice"}`
+        ) || ""; // The voice ID you're using
 
       const options = {
         method: "POST",
