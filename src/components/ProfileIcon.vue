@@ -14,9 +14,6 @@ export default {
     role: String,
   },
 
-  mounted() {
-    console.log(this.role);
-  },
   components: {
     ChatGPTIcon,
     GeminiIcon,

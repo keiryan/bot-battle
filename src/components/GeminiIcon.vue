@@ -13,9 +13,6 @@ export default {
   props: {
     msg: String,
   },
-  mounted() {
-    console.log('GeminiIcon');
-  },
 };
 </script>
 

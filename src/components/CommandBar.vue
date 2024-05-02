@@ -38,32 +38,13 @@
         />
       </form>
       <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">ChatGPT</div>
-      <!-- <div class="flex items-center gap-4 pl-1 text-sm mb-6">
-        API Key
-        <div
-          class="flex items-center h-8 pl-2 rounded flex-1"
-          :class="editingAPIKey ? 'bg-[#060606FF]' : 'bg-[#151515FF]'"
-        >
-          <input
-            type="password"
-            class="w-full mr-2 bg-transparent outline-none border-none"
-            v-model="chatGPTApiKey"
-            @blur="toggleEditingAPIKey"
-            v-if="editingAPIKey"
-            ref="autoFocusInput"
-          />
-          <div
-            class="flex w-full items-center h-8 opacity-50 cursor-pointer"
-            v-if="!editingAPIKey"
-            @click="toggleEditingAPIKey"
-          >
-            {{ chatGPTApiKey.replace(/./g, "•") }}
-          </div>
-        </div>
-      </div> -->
-      <CommandBarListInput text="ChatGPT API Key" keyName="ChatGPTAPIKey" />
+      <CommandBarListInput text="API Key" type="sensitive" keyName="ChatGPTAPIKey" />
+      <CommandBarListInput text="Voice" type="text" keyName="ChatGPTVoice" />
       <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Gemini</div>
-      <CommandBarListInput text="Gemini API Key" keyName="GeminiAPIKey" />
+      <CommandBarListInput text="API Key" type="sensitive" keyName="GeminiAPIKey" />
+      <CommandBarListInput text="Voice" type="text" keyName="GeminiVoice" />
+      <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Eleven Labs</div>
+      <CommandBarListInput text="API Key" type="sensitive" keyName="ElevenLabsAPIKey" />
     </div>
   </div>
 </template>

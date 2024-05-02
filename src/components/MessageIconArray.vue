@@ -3,7 +3,12 @@
   <div
     class="icons-container opacity-0 transition-all duration-300 ease-in-out mt-2"
   >
-    <MessageIconAction action="read" v-if="message.sender !== 'user'" :message="message">
+    <MessageIconAction
+      action="read"
+      v-if="message.sender !== 'user'"
+      :message="message"
+      @click="handleAudioFetch(message.message)"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -39,7 +44,9 @@
 </template>
 
 <script>
+import axios from "axios";
 import MessageIconAction from "./MessageIconAction.vue";
+import { ref } from "vue";
 
 export default {
   name: "MessageIconArray",
@@ -48,6 +55,44 @@ export default {
   },
   components: {
     MessageIconAction,
+  },
+
+  setup(props) {
+    const audioPlayer = ref(null);
+
+    const handleAudioFetch = async (text) => {
+      const API_KEY = localStorage.getItem('ElevenLabsAPIKey') || '';
+      const VOICE_ID = localStorage.getItem('GeminiVoice') || ''; // The voice ID you're using
+
+      const options = {
+        method: "POST",
+        url: `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+        headers: {
+          accept: "audio/mpeg",
+          "content-type": "application/json",
+          "xi-api-key": API_KEY,
+        },
+        data: { text },
+        responseType: "arraybuffer",
+      };
+
+      try {
+        const response = await axios.request(options);
+        const blob = new Blob([response.data], { type: "audio/mpeg" });
+        const url = URL.createObjectURL(blob);
+        if (audioPlayer.value) {
+          audioPlayer.value.src = url;
+          audioPlayer.value.play();
+        } else {
+          audioPlayer.value = new Audio(url);
+          audioPlayer.value.play();
+        }
+      } catch (error) {
+        console.error("Error fetching and playing audio:", error);
+      }
+    };
+
+    return { handleAudioFetch };
   },
 };
 </script>
