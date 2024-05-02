@@ -32,16 +32,17 @@ export default {
   methods: {
     onSubmit(message) {
       this.chatSubmission(message, "user");
-      this.callToApi();
+      this.callToApi(message);
     },
 
     chatSubmission(message, user) {
+      console.count("chatSubmission");
       this.messages.push({
         id: this.messages.length + 1,
         message: message,
         sender: user,
       });
-      // Store in local storage
+      //   Store in local storage
       localStorage.setItem("GeminiMessages", JSON.stringify(this.messages));
       this.scrollToBottom();
     },
@@ -57,17 +58,27 @@ export default {
     },
 
     // Fetch initial message from Gemini
-    async callToApi() {
+    async callToApi(message) {
       const apiKey = localStorage.getItem("GeminiAPIKey");
       const genAI = new GoogleGenerativeAI(apiKey);
-
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-      const prompt = this.messages[this.messages.length - 1].message;
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      this.chatSubmission(text, "gemini");
+      // Remove the last message as it is the user's message and the model automatically duplicates it due to the way the .startChat() method works
+      const chat = model.startChat({
+        history: [
+          ...this.messages
+            .map((message) => ({
+              role: message.sender === "gemini" ? "model" : "user",
+              parts: [{ text: message.message }],
+            }))
+            .slice(0, -1),
+        ],
+      });
+
+      const result = await chat.sendMessage(message);
+      const response = result.response;
+      this.chatSubmission(response.text(), "gemini");
+      console.log(response.text());
     },
   },
 
