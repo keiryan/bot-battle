@@ -19,11 +19,12 @@
 import ChatBox from "./ChatBox.vue";
 import ChatGPTMessage from "./ChatGPTMessage.vue";
 import MessageBox from "./MessageBox.vue";
+import getStats from "../utils/stats";
 
 export default {
   name: "ChatGPT",
   props: {
-    msg: String,
+    query: String,
   },
   components: {
     ChatBox,
@@ -58,30 +59,41 @@ export default {
       });
     },
 
-    // Fetch initial message from ChatGPT
     async callToApi() {
-      const apiKey = localStorage.getItem('ChatGPTAPIKey');
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model: "gpt-4-turbo",
-            messages: [
-              ...this.messages.map((message) => ({
-                role: message.sender === "user" ? "user" : "assistant",
-                content: message.message,
-              })),
-            ],
-          }),
-        }
-      );
-      const data = await response.json();
-      this.chatSubmission(data.choices[0].message.content, "ai-chatgpt");
+      const start = performance.now(); // Start timing before request
+      const apiKey = localStorage.getItem("ChatGPTAPIKey");
+      try {
+        const response = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+              model: "gpt-4-turbo",
+              messages: [
+                ...this.messages.map((message) => ({
+                  role: message.sender === "user" ? "user" : "assistant",
+                  content: message.message,
+                })),
+              ],
+            }),
+          }
+        );
+        const data = await response.json();
+        const end = performance.now(); // End timing after response
+        getStats({
+          start,
+          end,
+          assistant: "ChatGPT",
+          message: data.choices[0].message.content,
+        });
+        this.chatSubmission(data.choices[0].message.content, "ai-chatgpt");
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 
@@ -93,6 +105,14 @@ export default {
     return {
       messages: JSON.parse(localStorage.getItem("chatGPTMessages")) || [],
     };
+  },
+
+  watch: {
+    query: {
+      handler(newVal) {
+        this.onSubmit(newVal);
+      },
+    },
   },
 };
 </script>

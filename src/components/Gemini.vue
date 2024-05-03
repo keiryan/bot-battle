@@ -20,6 +20,7 @@ import ChatBox from "./ChatBox.vue";
 import ChatGPTMessage from "./ChatGPTMessage.vue";
 import MessageBox from "./MessageBox.vue";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import getStats from "../utils/stats";
 
 export default {
   name: "Gemini",
@@ -27,6 +28,10 @@ export default {
     ChatBox,
     ChatGPTMessage,
     MessageBox,
+  },
+
+  props: {
+    query: String,
   },
 
   methods: {
@@ -56,27 +61,38 @@ export default {
       });
     },
 
-    // Fetch initial message from Gemini
     async callToApi(message) {
       const apiKey = localStorage.getItem("GeminiAPIKey");
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const startTime = performance.now(); // Start timing before request
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-      // Remove the last message as it is the user's message and the model automatically duplicates it due to the way the .startChat() method works
-      const chat = model.startChat({
-        history: [
-          ...this.messages
-            .map((message) => ({
-              role: message.sender === "gemini" ? "model" : "user",
-              parts: [{ text: message.message }],
-            }))
-            .slice(0, -1),
-        ],
-      });
+        // Remove the last message as it is the user's message and the model automatically duplicates it due to the way the .startChat() method works
+        const chat = model.startChat({
+          history: [
+            ...this.messages
+              .map((message) => ({
+                role: message.sender === "gemini" ? "model" : "user",
+                parts: [{ text: message.message }],
+              }))
+              .slice(0, -1),
+          ],
+        });
 
-      const result = await chat.sendMessage(message);
-      const response = result.response;
-      this.chatSubmission(response.text(), "gemini");
+        const result = await chat.sendMessage(message);
+        const response = result.response;
+        this.chatSubmission(response.text(), "gemini");
+        const endTime = performance.now();
+        getStats({
+          start: startTime,
+          end: endTime,
+          message: response.text(),
+          assistant: "Gemini",
+        });
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 
@@ -88,6 +104,14 @@ export default {
     return {
       messages: JSON.parse(localStorage.getItem("GeminiMessages")) || [],
     };
+  },
+
+  watch: {
+    query: {
+      handler(newVal) {
+        this.onSubmit(newVal);
+      },
+    },
   },
 };
 </script>

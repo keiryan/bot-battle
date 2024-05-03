@@ -35,16 +35,29 @@
           class="bg-transparent outline-none border-none text-white w-full"
           autocomplete="off"
           v-model="search"
+          ref="inputToFocus"
         />
       </form>
       <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">ChatGPT</div>
-      <CommandBarListInput text="API Key" type="sensitive" keyName="ChatGPTAPIKey" />
+      <CommandBarListInput
+        text="API Key"
+        type="sensitive"
+        keyName="ChatGPTAPIKey"
+      />
       <CommandBarListInput text="Voice" type="text" keyName="ChatGPTVoice" />
       <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Gemini</div>
-      <CommandBarListInput text="API Key" type="sensitive" keyName="GeminiAPIKey" />
+      <CommandBarListInput
+        text="API Key"
+        type="sensitive"
+        keyName="GeminiAPIKey"
+      />
       <CommandBarListInput text="Voice" type="text" keyName="GeminiVoice" />
       <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Eleven Labs</div>
-      <CommandBarListInput text="API Key" type="sensitive" keyName="ElevenLabsAPIKey" />
+      <CommandBarListInput
+        text="API Key"
+        type="sensitive"
+        keyName="ElevenLabsAPIKey"
+      />
     </div>
   </div>
 </template>
@@ -64,21 +77,27 @@ export default {
 
   methods: {
     handleClick(event) {
-      // Only toggle if the event was triggered on this div and not a child
+      // Only toggle if the event was triggered on this div and not a child.
+      // This prevents the command bar from closing when clicking inside it.
       if (event.target === event.currentTarget) {
         this.toggleCommandBar();
       }
     },
 
-    submitSearchTerm() {
-      console.log(this.search);
+    submitSearchTerm(e) {
+      e.preventDefault();
+      // Emit the search term to the parent component
+      this.$emit("submitQuery", this.search);
+      this.search = "";
+      this.$emit("closeCommandBar", false);
     },
+  },
 
-    toggleEditingAPIKey() {
-      this.editingAPIKey = !this.editingAPIKey;
-      if (this.editingAPIKey) {
+  watch: {
+    active(newVal) {
+      if (newVal) {
         this.$nextTick(() => {
-          this.$refs.autoFocusInput.focus();
+          this.$refs.inputToFocus.focus();
         });
       }
     },
@@ -86,9 +105,6 @@ export default {
 
   data() {
     return {
-      value: "",
-      chatGPTApiKey: "this",
-      editingAPIKey: false,
       search: "",
     };
   },
