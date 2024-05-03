@@ -64,7 +64,9 @@ export default {
       const API_KEY = localStorage.getItem("ElevenLabsAPIKey") || "";
       const VOICE_ID =
         localStorage.getItem(
-          `${props.message.sender === "gemini" ? "GeminiVoice" : "ChatGPTVoice"}`
+          `${
+            props.message.sender === "gemini" ? "GeminiVoice" : "ChatGPTVoice"
+          }`
         ) || ""; // The voice ID you're using
 
       const options = {
