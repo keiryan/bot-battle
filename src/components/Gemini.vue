@@ -1,6 +1,10 @@
 <template>
   <ChatBox>
-    <div class="w-full h-full bg-[#212121] flex justify-center px-4">
+    <div class="relative w-full h-full bg-[#212121] flex justify-center px-4">
+      <ChatHeader
+        passedName="Gemini"
+        :callStats="{ formattedTime, timeTaken, messageLength }"
+      />
       <!-- Box containing messages -->
       <div class="flex flex-col w-full max-w-3xl py-4">
         <!-- Chat Messages -->
@@ -21,6 +25,7 @@ import ChatGPTMessage from "./ChatGPTMessage.vue";
 import MessageBox from "./MessageBox.vue";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import getStats from "../utils/stats";
+import ChatHeader from "./ChatHeader.vue";
 
 export default {
   name: "Gemini",
@@ -28,6 +33,7 @@ export default {
     ChatBox,
     ChatGPTMessage,
     MessageBox,
+    ChatHeader,
   },
 
   props: {
@@ -36,7 +42,11 @@ export default {
 
   methods: {
     onSubmit(message) {
-      this.chatSubmission(message, "user");
+      if (this.messages.at(-1).sender === "user") {
+        console.log("User has already sent a message");
+      } else {
+        this.chatSubmission(message, "user");
+      }
       this.callToApi(message);
     },
 
@@ -84,12 +94,15 @@ export default {
         const response = result.response;
         this.chatSubmission(response.text(), "gemini");
         const endTime = performance.now();
-        getStats({
+        const { timeTaken, messageLength, formattedTime } = getStats({
           start: startTime,
           end: endTime,
           message: response.text(),
           assistant: "Gemini",
         });
+        this.timeTaken = timeTaken;
+        this.messageLength = messageLength;
+        this.formattedTime = formattedTime;
       } catch (error) {
         console.error(error);
       }
@@ -103,6 +116,9 @@ export default {
   data() {
     return {
       messages: JSON.parse(localStorage.getItem("GeminiMessages")) || [],
+      timeTaken: 0,
+      messageLength: 0,
+      formattedTime: "",
     };
   },
 
