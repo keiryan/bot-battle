@@ -1,6 +1,7 @@
 <template>
   <ChatBox>
-    <div class="w-full h-full bg-[#212121] flex justify-center px-4">
+    <div class="relative w-full h-full bg-[#212121] flex justify-center px-4">
+      <ChatHeader :callStats="{ formattedTime, timeTaken, messageLength }" passedName="ChatGPT" />
       <!-- Box containing messages -->
       <div class="flex flex-col w-full max-w-3xl py-4">
         <!-- Chat Messages -->
@@ -20,6 +21,7 @@ import ChatBox from "./ChatBox.vue";
 import ChatGPTMessage from "./ChatGPTMessage.vue";
 import MessageBox from "./MessageBox.vue";
 import getStats from "../utils/stats";
+import ChatHeader from "./ChatHeader.vue";
 
 export default {
   name: "ChatGPT",
@@ -30,6 +32,7 @@ export default {
     ChatBox,
     ChatGPTMessage,
     MessageBox,
+    ChatHeader,
   },
 
   methods: {
@@ -72,7 +75,7 @@ export default {
               Authorization: `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-              model: "gpt-4-turbo",
+              model: this.currentModel,
               messages: [
                 ...this.messages.map((message) => ({
                   role: message.sender === "user" ? "user" : "assistant",
@@ -84,13 +87,16 @@ export default {
         );
         const data = await response.json();
         const end = performance.now(); // End timing after response
-        getStats({
+        const { timeTaken, messageLength, formattedTime } = getStats({
           start,
           end,
           assistant: "ChatGPT",
           message: data.choices[0].message.content,
         });
         this.chatSubmission(data.choices[0].message.content, "ai-chatgpt");
+        this.timeTaken = timeTaken;
+        this.messageLength = messageLength;
+        this.formattedTime = formattedTime;
       } catch (error) {
         console.error(error);
       }
@@ -104,6 +110,14 @@ export default {
   data() {
     return {
       messages: JSON.parse(localStorage.getItem("chatGPTMessages")) || [],
+      currentModel: "gpt-4-turbo",
+      modelLegend: {
+        "gpt-4": "gpt-4-turbo",
+        "gpt-3": "gpt-3-turbo",
+      },
+      timeTaken: 0,
+      messageLength: 0,
+      formattedTime: "",
     };
   },
 
