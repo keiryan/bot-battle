@@ -27,6 +27,9 @@ export default {
   },
 
   mounted() {
+    if (!localStorage.getItem("username")) {
+      localStorage.setItem("username", "You");
+    }
     window.addEventListener("keydown", this.handleKeyDown);
   },
 

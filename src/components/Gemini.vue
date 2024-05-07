@@ -2,8 +2,9 @@
   <ChatBox>
     <div class="relative w-full h-full bg-[#212121] flex justify-center px-4">
       <ChatHeader
-        passedName="Gemini"
+        initialName="Gemini"
         :callStats="{ formattedTime, timeTaken, messageLength }"
+        initialModel="Gemini Advanced"
       />
       <!-- Box containing messages -->
       <div class="flex flex-col w-full max-w-3xl py-4">
