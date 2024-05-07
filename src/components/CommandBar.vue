@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed w-screen bg-[#000000AB] text-white h-screen flex items-start justify-center transition-opacity duration-300 ease-in-out pt-64"
+    class="fixed z-[9999] w-screen bg-[#000000AB] text-white h-screen flex items-start justify-center transition-opacity duration-300 ease-in-out pt-64"
     :class="
       active
         ? 'opacity-100 backdrop-blur-sm'
@@ -38,26 +38,43 @@
           ref="inputToFocus"
         />
       </form>
-      <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">ChatGPT</div>
-      <CommandBarListInput
-        text="API Key"
-        type="sensitive"
-        keyName="ChatGPTAPIKey"
-      />
-      <CommandBarListInput text="Voice" type="text" keyName="ChatGPTVoice" />
-      <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Gemini</div>
-      <CommandBarListInput
-        text="API Key"
-        type="sensitive"
-        keyName="GeminiAPIKey"
-      />
-      <CommandBarListInput text="Voice" type="text" keyName="GeminiVoice" />
-      <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Eleven Labs</div>
-      <CommandBarListInput
-        text="API Key"
-        type="sensitive"
-        keyName="ElevenLabsAPIKey"
-      />
+
+      <section class="mb-4">
+        <h3 class="text-[#FFFFFF7B] pl-1 mb-2">User Settings</h3>
+        <CommandBarListInput
+          text="Username"
+          type="text"
+          keyName="username"
+          default="You"
+        />
+      </section>
+      <section class="mb-4">
+        <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">ChatGPT Settings</div>
+        <CommandBarListInput
+          text="API Key"
+          type="sensitive"
+          keyName="ChatGPTAPIKey"
+        />
+        <CommandBarListInput text="Voice" type="text" keyName="ChatGPTVoice" />
+      </section>
+      <section class="mb-4">
+        <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Gemini Settings</div>
+        <CommandBarListInput
+          text="API Key"
+          type="sensitive"
+          keyName="GeminiAPIKey"
+        />
+        <CommandBarListInput text="Voice" type="text" keyName="GeminiVoice" />
+      </section>
+
+      <section class="mb-4">
+        <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Eleven Labs</div>
+        <CommandBarListInput
+          text="API Key"
+          type="sensitive"
+          keyName="ElevenLabsAPIKey"
+        />
+      </section>
     </div>
   </div>
 </template>

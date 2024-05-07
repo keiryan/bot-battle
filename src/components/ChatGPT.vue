@@ -1,7 +1,16 @@
 <template>
   <ChatBox>
     <div class="relative w-full h-full bg-[#212121] flex justify-center px-4">
-      <ChatHeader :callStats="{ formattedTime, timeTaken, messageLength }" passedName="ChatGPT" />
+      <ChatSettings
+        :active="settingsActive"
+        :toggleCommandBar="toggleSettings"
+      />
+      <ChatHeader
+        :callStats="{ formattedTime, timeTaken, messageLength }"
+        initialName="ChatGPT"
+        initialModel="GPT-4"
+        @toggleSettings="toggleSettings"
+      />
       <!-- Box containing messages -->
       <div class="flex flex-col w-full max-w-3xl py-4">
         <!-- Chat Messages -->
@@ -22,6 +31,7 @@ import ChatGPTMessage from "./ChatGPTMessage.vue";
 import MessageBox from "./MessageBox.vue";
 import getStats from "../utils/stats";
 import ChatHeader from "./ChatHeader.vue";
+import ChatSettings from "./ChatSettings.vue";
 
 export default {
   name: "ChatGPT",
@@ -33,12 +43,17 @@ export default {
     ChatGPTMessage,
     MessageBox,
     ChatHeader,
+    ChatSettings,
   },
 
   methods: {
     onSubmit(message) {
       this.chatSubmission(message, "user");
       this.callToApi();
+    },
+
+    toggleSettings() {
+      this.settingsActive = !this.settingsActive;
     },
 
     chatSubmission(message, user) {
@@ -118,6 +133,7 @@ export default {
       timeTaken: 0,
       messageLength: 0,
       formattedTime: "",
+      settingsActive: false,
     };
   },
 

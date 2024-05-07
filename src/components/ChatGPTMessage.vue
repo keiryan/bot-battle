@@ -61,7 +61,7 @@ export default {
   data() {
     return {
       senderLegend: {
-        user: "You",
+        user: localStorage.getItem("username"),
         'ai-chatgpt': "ChatGPT",
         gemini: "Gemini",
       },

@@ -46,8 +46,10 @@
         </div>
       </div>
 
+      <!-- Settings Icon -->
       <div
         class="cursor-pointer transition-all duration-300 ease-in-out hover:rotate-90"
+        @click="$emit('toggle-settings')"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -88,11 +90,13 @@ export default {
 
   props: {
     callStats: Object,
-    passedName: String,
+    initialName: String,
+    initialModel: String,
   },
 
   mounted() {
-    this.nickname = this.passedName;
+    this.nickname = this.initialName;
+    this.modelName = this.initialModel;
   },
 
   methods: {
@@ -109,8 +113,19 @@ export default {
     return {
       nickname: "",
       editingNickname: false,
-      modelName: "GPT-4",
+      modelName: "",
     };
+  },
+
+  watch: {
+    editingNickname(newVal) {
+      if (newVal) {
+        this.$nextTick(() => {
+          this.$refs.nicknameInput.focus();
+          this.adjustWidth();
+        });
+      }
+    },
   },
 };
 </script>

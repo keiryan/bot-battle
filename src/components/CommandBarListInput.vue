@@ -33,10 +33,11 @@ export default {
     text: String,
     keyName: String,
     type: String,
+    default: String,
   },
 
   mounted() {
-    this.value = localStorage.getItem(this.keyName) || "";
+    this.value = localStorage.getItem(this.keyName) || this.default;
   },
 
   methods: {
