@@ -1,5 +1,5 @@
 # Bot Battle
 
-Battle for dominance of your favorite AI chat bots! 🤖🥊🤖
+Battle for dominance of your favorite AI chat bots! 🤖🥊🤖 
 
-⚠️ Under Contruction ⚠️
+🚜⚠️ Under Contruction ⚠️🚜
