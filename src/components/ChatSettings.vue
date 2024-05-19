@@ -11,17 +11,23 @@
     <div
       class="flex flex-col mx-4 w-full max-w-2xl bg-[#0D0D0D] p-4 rounded-xl border border-[#404040] shadow-lg"
     >
-      <div>Close chat</div>
+      <div class="flex justify-between text-[#A2A2A2]">Auto send mic input
+        <Toggle @toggled="autoSend"/>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Toggle from "./Toggle.vue";
 export default {
   name: "ChatSettings",
   props: {
     active: Boolean,
     toggleCommandBar: Function,
+  },
+  components: {
+    Toggle,
   },
   methods: {
     handleClick(event) {
@@ -30,6 +36,11 @@ export default {
       if (event.target === event.currentTarget) {
         this.toggleCommandBar();
       }
+    },
+
+    autoSend(value) {
+      console.log("Auto send", value);
+      this.$emit("auto-send", value);
     },
   },
 };

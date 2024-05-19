@@ -26,6 +26,20 @@
       v-model="message"
     />
 
+    <div class="mr-2">
+      <CircleStop
+        v-if="recording"
+        class="cursor-pointer"
+        color="#fff"
+        @click="stopRecording"
+      />
+      <Mic v-else color="#fff" class="cursor-pointer" @click="startRecording" />
+    </div>
+
+    <template>
+      <Headphones />
+    </template>
+
     <!-- Submit button -->
     <div
       @click="onSubmit"
@@ -56,13 +70,19 @@
   </form>
 </template>
 
+<script setup>
+import { Mic, CircleStop } from "lucide-vue-next";
+</script>
+
 <script>
 import Tooltip from "./Tooltip.vue";
+import { watch } from "vue";
 
 export default {
   name: "MessageBox",
   props: {
     submitEvent: Function,
+    autoSendMicInput: Boolean,
   },
 
   components: {
@@ -73,6 +93,9 @@ export default {
     return {
       message: "",
       showTooltip: false,
+      recording: false,
+      mediaRecorder: null,
+      audioChunks: [],
     };
   },
 
@@ -90,6 +113,58 @@ export default {
   },
 
   methods: {
+    async startRecording() {
+      this.recording = true;
+      this.audioChunks = [];
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(stream);
+
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.audioChunks.push(event.data);
+        }
+      };
+
+      this.mediaRecorder.onstop = this.handleRecordingStop;
+      this.mediaRecorder.start(1000); // Collect data every second
+    },
+
+    async stopRecording() {
+      this.recording = false;
+      setTimeout(() => this.mediaRecorder.stop(), 500); // Delay stopping by 500ms
+    },
+
+    async handleRecordingStop() {
+      const audioBlob = new Blob(this.audioChunks, { type: "audio/wav" });
+      const formData = new FormData();
+      formData.append("file", audioBlob, "audio.wav");
+      formData.append("model", "whisper-1");
+
+      try {
+        const response = await fetch(
+          "https://api.openai.com/v1/audio/transcriptions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("ChatGPTAPIKey")}`,
+            },
+            body: formData,
+          }
+        );
+
+        const result = await response.json();
+
+        if (this.autoSendMicInput) {
+          this.submitEvent(result.text);
+        } else {
+          this.message = result.text;
+        }
+      } catch (error) {
+        console.error("Error sending audio to Whisper API:", error);
+      }
+    },
+
     onSubmit(e) {
       if (this.message.length > 0) {
         const textarea = this.$el.querySelector("textarea");
@@ -129,5 +204,19 @@ export default {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #4b4b4b; /* Change color on hover */
   cursor: pointer;
+}
+
+.record-button,
+.recording-button {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.recording-button {
+  background-color: #ff4d4d;
 }
 </style>
