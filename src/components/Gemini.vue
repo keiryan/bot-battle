@@ -1,19 +1,25 @@
 <template>
   <ChatBox>
     <div class="relative w-full h-full bg-[#212121] flex justify-center px-4">
+      <ChatSettings
+        :active="settingsActive"
+        :toggleCommandBar="toggleSettings"
+        @auto-send="autoSend"
+      />
       <ChatHeader
         initialName="Gemini"
         :callStats="{ formattedTime, timeTaken, messageLength }"
-        initialModel="Gemini Advanced"
+        initialModel="Gemini Pro"
+        @toggleSettings="toggleSettings"
       />
       <!-- Box containing messages -->
       <div class="flex flex-col w-full max-w-3xl py-4">
         <!-- Chat Messages -->
-        <div class="w-full h-full overflow-y-auto no-scrollbar">
+        <div class="w-full h-full overflow-y-auto no-scrollbar pt-16">
           <ChatGPTMessage v-for="message in messages" :message="message" />
         </div>
         <div class="w-full">
-          <MessageBox :submitEvent="onSubmit" />
+          <MessageBox :submitEvent="onSubmit" :autoSendMicInput="autoSendMicInput" />
         </div>
       </div>
     </div>
@@ -27,6 +33,7 @@ import MessageBox from "./MessageBox.vue";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import getStats from "../utils/stats";
 import ChatHeader from "./ChatHeader.vue";
+import ChatSettings from "./ChatSettings.vue";
 
 export default {
   name: "Gemini",
@@ -35,20 +42,31 @@ export default {
     ChatGPTMessage,
     MessageBox,
     ChatHeader,
+    ChatSettings,
   },
 
   props: {
     query: String,
+    chatParams: Object,
   },
 
   methods: {
     onSubmit(message) {
-      if (this.messages.at(-1).sender === "user") {
+      if (this.messages?.at(-1)?.sender === "user") {
         console.log("User has already sent a message");
       } else {
         this.chatSubmission(message, "user");
       }
       this.callToApi(message);
+    },
+
+    autoSend(value) {
+      console.log("Auto send", value);
+      this.autoSendMicInput = value;
+    },
+
+    toggleSettings() {
+      this.settingsActive = !this.settingsActive;
     },
 
     chatSubmission(message, user) {
@@ -58,7 +76,7 @@ export default {
         sender: user,
       });
       //   Store in local storage
-      localStorage.setItem("GeminiMessages", JSON.stringify(this.messages));
+      localStorage.setItem(this.chatParams.id, JSON.stringify(this.messages));
       this.scrollToBottom();
     },
 
@@ -77,7 +95,7 @@ export default {
       const startTime = performance.now(); // Start timing before request
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: this.chatParams.model });
 
         // Remove the last message as it is the user's message and the model automatically duplicates it due to the way the .startChat() method works
         const chat = model.startChat({
@@ -116,10 +134,12 @@ export default {
 
   data() {
     return {
-      messages: JSON.parse(localStorage.getItem("GeminiMessages")) || [],
+      messages: JSON.parse(localStorage.getItem(`${this.chatParams.id}`)) || [],
       timeTaken: 0,
       messageLength: 0,
       formattedTime: "",
+      settingsActive: false,
+      autoSendMicInput: false,
     };
   },
 

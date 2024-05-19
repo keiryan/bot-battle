@@ -4,6 +4,7 @@
       <ChatSettings
         :active="settingsActive"
         :toggleCommandBar="toggleSettings"
+        @auto-send="autoSend"
       />
       <ChatHeader
         :callStats="{ formattedTime, timeTaken, messageLength }"
@@ -14,11 +15,14 @@
       <!-- Box containing messages -->
       <div class="flex flex-col w-full max-w-3xl py-4">
         <!-- Chat Messages -->
-        <div class="w-full h-full overflow-y-auto no-scrollbar">
+        <div class="w-full h-full overflow-y-auto no-scrollbar pt-16">
           <ChatGPTMessage v-for="message in messages" :message="message" />
         </div>
         <div class="w-full">
-          <MessageBox :submitEvent="onSubmit" />
+          <MessageBox
+            :submitEvent="onSubmit"
+            :autoSendMicInput="autoSendMicInput"
+          />
         </div>
       </div>
     </div>
@@ -37,6 +41,7 @@ export default {
   name: "ChatGPT",
   props: {
     query: String,
+    chatParams: Object,
   },
   components: {
     ChatBox,
@@ -52,6 +57,10 @@ export default {
       this.callToApi();
     },
 
+    autoSend(value) {
+      this.autoSendMicInput = value;
+    },
+
     toggleSettings() {
       this.settingsActive = !this.settingsActive;
     },
@@ -63,7 +72,7 @@ export default {
         sender: user,
       });
       // Store in local storage
-      localStorage.setItem("chatGPTMessages", JSON.stringify(this.messages));
+      localStorage.setItem(this.chatParams.id, JSON.stringify(this.messages));
       this.scrollToBottom();
     },
 
@@ -124,8 +133,8 @@ export default {
 
   data() {
     return {
-      messages: JSON.parse(localStorage.getItem("chatGPTMessages")) || [],
-      currentModel: "gpt-4-turbo",
+      messages: JSON.parse(localStorage.getItem(`${this.chatParams.id}`)) || [],
+      currentModel: this.chatParams.model ?? "gpt-4-turbo",
       modelLegend: {
         "gpt-4": "gpt-4-turbo",
         "gpt-3": "gpt-3-turbo",
@@ -134,6 +143,9 @@ export default {
       messageLength: 0,
       formattedTime: "",
       settingsActive: false,
+      autoSend(value) {
+        this.autoSendMicInput = value;
+      },
     };
   },
 
