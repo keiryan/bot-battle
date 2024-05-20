@@ -5,6 +5,8 @@
         :active="settingsActive"
         :toggleCommandBar="toggleSettings"
         @auto-send="autoSend"
+        :chatParams="chatParams"
+        @close-chat="handleCloseChat"
       />
       <ChatHeader
         :callStats="{ formattedTime, timeTaken, messageLength }"
@@ -55,6 +57,10 @@ export default {
     onSubmit(message) {
       this.chatSubmission(message, "user");
       this.callToApi();
+    },
+
+    handleCloseChat() {
+      this.$emit("chat-closed", this.chatParams);
     },
 
     autoSend(value) {

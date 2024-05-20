@@ -1,12 +1,18 @@
 <template>
   <div className="w-screen h-screen flex overflow-hidden">
-    <ChatGPT :query="this.query" v-for="chat in gptChats" :chatParams="chat" />
+    <ChatGPT
+      :query="this.query"
+      v-for="chat in gptChats"
+      :chatParams="chat"
+      @chat-closed="handleChatClosed"
+    />
     <!-- Visual divider -->
     <!-- <div class="w-2 h-full bg-black" /> -->
     <Gemini
       :query="this.query"
       v-for="chat in geminiChats"
       :chatParams="chat"
+      @chat-closed="handleChatClosed"
     />
 
     <NewChat @addChat="addChat" :totalChats="totalChats" />
@@ -55,6 +61,19 @@ export default {
       }
     },
 
+    handleChatClosed(passedChat) {
+      // TODO: Find a more robust way to handle chat closing
+      if (passedChat.type === "gemini") {
+        this.geminiChats = this.geminiChats.filter(
+          (chat) => chat.id !== passedChat.id
+        );
+      } else if (passedChat.type === "gpt") {
+        this.gptChats = this.gptChats.filter((chat) => chat.id !== passedChat.id);
+      }
+
+      this.totalChats = this.geminiChats.length + this.gptChats.length;
+    },
+
     toggleCommandBar() {
       this.commandBarActive = !this.commandBarActive;
     },
@@ -75,7 +94,7 @@ export default {
         this.gptChats.push(chat);
       }
 
-      this.totalChats += 1;
+      this.totalChats = this.geminiChats.length + this.gptChats.length;
     },
   },
 
