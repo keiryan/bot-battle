@@ -5,6 +5,8 @@
         :active="settingsActive"
         :toggleCommandBar="toggleSettings"
         @auto-send="autoSend"
+        @chatParams="chatParams"
+        @close-chat="handleCloseChat"
       />
       <ChatHeader
         initialName="Gemini"
@@ -61,12 +63,15 @@ export default {
     },
 
     autoSend(value) {
-      console.log("Auto send", value);
       this.autoSendMicInput = value;
     },
 
     toggleSettings() {
       this.settingsActive = !this.settingsActive;
+    },
+
+    handleCloseChat() {
+      this.$emit("chat-closed", this.chatParams);
     },
 
     chatSubmission(message, user) {
