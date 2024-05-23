@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute inset-x-1/2 flex flex-col items-center z-[999]"
+    class="absolute inset-x-1/2 flex flex-col items-center z-[9999]"
     :class="positionLegend[position]"
   >
     <!-- Carret -->

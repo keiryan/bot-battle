@@ -26,7 +26,7 @@
       v-model="message"
     />
 
-    <div class="mr-2">
+    <div class="transition-all duration-300 ease-in-out mr-2 opacity-50 hover:opacity-100">
       <CircleStop
         v-if="recording"
         class="cursor-pointer"
@@ -76,7 +76,6 @@ import { Mic, CircleStop } from "lucide-vue-next";
 
 <script>
 import Tooltip from "./Tooltip.vue";
-import { watch } from "vue";
 
 export default {
   name: "MessageBox",
@@ -170,7 +169,8 @@ export default {
         const textarea = this.$el.querySelector("textarea");
         textarea.style.height = "1.5rem"; // Reset height
         e.preventDefault();
-        this.submitEvent(this.message);
+        // this.submitEvent(this.message);
+        this.$emit("chat-submission", { message: this.message });
         this.message = "";
       }
     },

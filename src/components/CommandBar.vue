@@ -1,83 +1,110 @@
 <template>
   <div
-    class="fixed z-[9999] w-screen bg-[#000000AB] text-white h-screen flex items-start justify-center transition-opacity duration-300 ease-in-out pt-64"
+    class="fixed z-[9999] w-screen backdrop-brightness-[0.20] text-white h-screen flex flex-col items-center justify-center transition-opacity duration-300 ease-in-out"
     :class="
       active
-        ? 'opacity-100 backdrop-blur-sm'
+        ? 'opacity-100 backdrop-blur'
         : 'opacity-0 pointer-events-none backdrop-blur-0'
     "
     @click="handleClick($event)"
   >
-    <div
-      class="flex flex-col mx-4 w-full max-w-2xl bg-[#0D0D0D] p-4 rounded-xl border border-[#404040] shadow-lg"
-    >
+    <div class="flex flex-col gap-6 w-full mx-4 max-w-2xl">
       <!-- Search Bar -->
-      <form
-        class="flex w-full gap-2 bg-[#060606FF] p-2 rounded-md mb-4"
-        @submit="submitSearchTerm"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="white"
-          class="w-6 h-6"
+      <div class="flex items-center">
+        <div
+          class="flex items-center cursor-pointer bg-[#060606FF] rounded-full border border-[#282828] overflow-hidden"
+          :class="
+            settingsOpen ? 'w-0 opacity-0 pointer-events-none' : 'p-2 mr-2'
+          "
+          @click="toggleSettings"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          <Settings2
+            size="20"
+            class="transition-all duration-300 ease-in-out opacity-50 hover:opacity-100"
+            :class="settingsOpen && '-translate-x-52'"
           />
-        </svg>
-        <input
-          type="text"
-          class="bg-transparent outline-none border-none text-white w-full"
-          autocomplete="off"
-          v-model="search"
-          ref="inputToFocus"
-        />
-      </form>
+        </div>
+        <form
+          class="flex flex-1 gap-2 bg-[#060606FF] p-2 px-3 rounded-full border border-[#282828]"
+          @submit="submitSearchTerm"
+        >
+          <input
+            type="text"
+            class="bg-transparent outline-none border-none text-white w-full"
+            autocomplete="off"
+            v-model="search"
+            ref="inputToFocus"
+            placeholder="Message all chats..."
+          />
+          <div
+            class="transition-all duration-300 ease-in-out opacity-50 hover:opacity-100 cursor-pointer"
+          >
+            <Search @click="submitSearchTerm" />
+          </div>
+        </form>
+      </div>
+      <div
+        class="flex flex-col bg-[#060606FF] p-4 rounded-xl border border-[#404040] shadow-lg transition-all duration-300 ease-in-out overflow-hidden"
+        :class="!settingsOpen ? 'max-h-0 opacity-0' : 'max-h-[30rem]'"
+      >
+        <div class="flex justify-between">
+          <h1 class="text-xl mb-6 text-[#DFDD00]">App Settings</h1>
+          <CircleX
+            class="cursor-pointer transition-all duration-150 ease-in-out hover:stroke-red-500"
+            @click="toggleSettings"
+            size="20"
+          />
+        </div>
+        <section class="mb-4">
+          <h3 class="pl-1 mb-4 text-[#e5e4e2]">User Settings</h3>
+          <CommandBarListInput
+            text="Username"
+            type="text"
+            keyName="username"
+            default="You"
+          />
+        </section>
+        <section class="mb-4">
+          <div class="pl-1 text-md mb-4 text-[#e5e4e2]">ChatGPT Settings</div>
+          <CommandBarListInput
+            text="API Key"
+            type="sensitive"
+            keyName="ChatGPTAPIKey"
+          />
+          <CommandBarListInput
+            text="Voice"
+            type="text"
+            keyName="ChatGPTVoice"
+          />
+        </section>
+        <section class="mb-4">
+          <div class="pl-1 text-md mb-4 text-[#e5e4e2]">Gemini Settings</div>
+          <CommandBarListInput
+            text="API Key"
+            type="sensitive"
+            keyName="GeminiAPIKey"
+          />
+          <CommandBarListInput text="Voice" type="text" keyName="GeminiVoice" />
+        </section>
 
-      <section class="mb-4">
-        <h3 class="text-[#FFFFFF7B] pl-1 mb-2">User Settings</h3>
-        <CommandBarListInput
-          text="Username"
-          type="text"
-          keyName="username"
-          default="You"
-        />
-      </section>
-      <section class="mb-4">
-        <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">ChatGPT Settings</div>
-        <CommandBarListInput
-          text="API Key"
-          type="sensitive"
-          keyName="ChatGPTAPIKey"
-        />
-        <CommandBarListInput text="Voice" type="text" keyName="ChatGPTVoice" />
-      </section>
-      <section class="mb-4">
-        <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Gemini Settings</div>
-        <CommandBarListInput
-          text="API Key"
-          type="sensitive"
-          keyName="GeminiAPIKey"
-        />
-        <CommandBarListInput text="Voice" type="text" keyName="GeminiVoice" />
-      </section>
-
-      <section class="mb-4">
-        <div class="text-[#FFFFFF7B] pl-1 text-md mb-2">Eleven Labs</div>
-        <CommandBarListInput
-          text="API Key"
-          type="sensitive"
-          keyName="ElevenLabsAPIKey"
-        />
-      </section>
+        <section class="mb-4">
+          <div class="text-[#FFFFFF7B] pl-1 text-md mb-2 text-[#e5e4e2]">
+            Eleven Labs
+          </div>
+          <CommandBarListInput
+            text="API Key"
+            type="sensitive"
+            keyName="ElevenLabsAPIKey"
+          />
+        </section>
+      </div>
     </div>
   </div>
 </template>
+
+<script setup>
+import { Search, Settings2, CircleX } from "lucide-vue-next";
+</script>
 
 <script>
 import CommandBarListInput from "./CommandBarListInput.vue";
@@ -99,6 +126,10 @@ export default {
       if (event.target === event.currentTarget) {
         this.toggleCommandBar();
       }
+    },
+
+    toggleSettings() {
+      this.settingsOpen = !this.settingsOpen;
     },
 
     submitSearchTerm(e) {
@@ -123,6 +154,7 @@ export default {
   data() {
     return {
       search: "",
+      settingsOpen: false,
     };
   },
 };

@@ -21,7 +21,10 @@
           <ChatGPTMessage v-for="message in messages" :message="message" />
         </div>
         <div class="w-full">
-          <MessageBox :submitEvent="onSubmit" :autoSendMicInput="autoSendMicInput" />
+          <MessageBox
+            @chat-submission="onSubmit"
+            :autoSendMicInput="autoSendMicInput"
+          />
         </div>
       </div>
     </div>
@@ -30,12 +33,12 @@
 
 <script>
 import ChatBox from "./ChatBox.vue";
-import ChatGPTMessage from "./ChatGPTMessage.vue";
+import ChatGPTMessage from "./Message.vue";
 import MessageBox from "./MessageBox.vue";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import getStats from "../utils/stats";
 import ChatHeader from "./ChatHeader.vue";
 import ChatSettings from "./ChatSettings.vue";
+import newMessage from "../utils/newMessage";
 
 export default {
   name: "Gemini",
@@ -57,9 +60,9 @@ export default {
       if (this.messages?.at(-1)?.sender === "user") {
         console.log("User has already sent a message");
       } else {
-        this.chatSubmission(message, "user");
+        this.chatSubmission(message);
       }
-      this.callToApi(message);
+      this.callToApi(message.message);
     },
 
     autoSend(value) {
@@ -74,12 +77,9 @@ export default {
       this.$emit("chat-closed", this.chatParams);
     },
 
-    chatSubmission(message, user) {
-      this.messages.push({
-        id: this.messages.length + 1,
-        message: message,
-        sender: user,
-      });
+    chatSubmission(message) {
+      console.log("chatSubmission", message);
+      this.messages.push(newMessage({ ...message }));
       //   Store in local storage
       localStorage.setItem(this.chatParams.id, JSON.stringify(this.messages));
       this.scrollToBottom();
@@ -100,7 +100,9 @@ export default {
       const startTime = performance.now(); // Start timing before request
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: this.chatParams.model });
+        const model = genAI.getGenerativeModel({
+          model: this.chatParams.model,
+        });
 
         // Remove the last message as it is the user's message and the model automatically duplicates it due to the way the .startChat() method works
         const chat = model.startChat({
@@ -116,17 +118,27 @@ export default {
 
         const result = await chat.sendMessage(message);
         const response = result.response;
-        this.chatSubmission(response.text(), "gemini");
         const endTime = performance.now();
-        const { timeTaken, messageLength, formattedTime } = getStats({
+        // const { timeTaken, messageLength, formattedTime } = getStats({
+        //   start: startTime,
+        //   end: endTime,
+        //   message: response.text(),
+        //   assistant: "Gemini",
+        // });
+        const timeTaken = endTime - startTime;
+        console.log("Time taken:", timeTaken);
+        const latestMessage = newMessage({
+          message: response.text(),
+          sender: "gemini",
           start: startTime,
           end: endTime,
-          message: response.text(),
-          assistant: "Gemini",
         });
-        this.timeTaken = timeTaken;
-        this.messageLength = messageLength;
-        this.formattedTime = formattedTime;
+
+        this.chatSubmission(latestMessage);
+
+        this.timeTaken = latestMessage.timeTaken;
+        this.messageLength = latestMessage.messageLength;
+        this.formattedTime = latestMessage.formattedTime;
       } catch (error) {
         console.error(error);
       }
@@ -151,7 +163,7 @@ export default {
   watch: {
     query: {
       handler(newVal) {
-        this.onSubmit(newVal);
+        this.onSubmit({ message: newVal });
       },
     },
   },

@@ -1,8 +1,8 @@
 <template>
     <!-- Add new chat -->
-    <div class="h-screen w-screen fixed pointer-events-none">
+    <div class="h-screen w-screen fixed pointer-events-none z-[9999]">
       <div
-        class="absolute z-[9999] top-1/2 cursor-pointer add-new-chat sidebar-menu pointer-events-auto"
+        class="absolute z-[999] top-1/2 cursor-pointer add-new-chat sidebar-menu pointer-events-auto"
         :class="totalChats > 0 ? 'flex flex-col right-4' : 'flex items-center left-1/2'"
         @mouseenter="showBackgroundBlur"
         @mouseleave="hideBackgroundBlur"
@@ -15,7 +15,7 @@
             src="../assets/openai.webp"
             alt="Open AI"
             class="w-full h-full"
-            @click="addChat({ type: 'gpt', model: 'gpt-4-turbo' })"
+            @click="addChat({ type: 'gpt', model: 'gpt-4o' })"
           />
         </div>
         <CirclePlus
@@ -117,7 +117,7 @@
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     pointer-events: none;
-    transition: all 300ms ease-in-out;
+    transition: all 150ms ease-in-out;
     opacity: 0;
     width: 100vw;
     height: 100vh;

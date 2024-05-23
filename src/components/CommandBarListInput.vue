@@ -1,9 +1,10 @@
 <template>
   <div class="flex items-center gap-4 pl-1 text-sm mb-4">
-    {{ text }}
-    <div
-      class="flex items-center h-8 pl-2 rounded flex-1"
-      :class="editing ? 'bg-[#060606FF]' : 'bg-[#151515FF]'"
+    <div class="w-20 text-[#FFFFFF7B]">{{ text }}</div>
+    <form
+      class="flex items-center h-8 pl-2 rounded flex-1 bg-[#151515FF]"
+      autocomplete="off"
+      @submit="toggleEditing"
     >
       <input
         :type="TypeLegend[type] || 'text'"
@@ -12,6 +13,7 @@
         @blur="toggleEditing"
         v-if="editing"
         ref="autoFocusInput"
+        autocomplete="new-password"
       />
       <div
         class="flex w-full items-center h-8 opacity-50 cursor-pointer"
@@ -20,7 +22,7 @@
       >
         {{ type === "sensitive" ? value.replace(/./g, "•") : value }}
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
@@ -48,7 +50,10 @@ export default {
       }
     },
 
-    toggleEditing() {
+    toggleEditing(e) {
+      if (e) {
+        e.preventDefault();
+      }
       this.editing = !this.editing;
       if (this.editing) {
         this.$nextTick(() => {
