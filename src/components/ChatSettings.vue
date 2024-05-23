@@ -9,19 +9,33 @@
     @click="handleClick($event)"
   >
     <div
-      class="flex flex-col mx-4 w-full max-w-2xl bg-[#0D0D0D] p-4 rounded-xl border border-[#404040] shadow-lg"
+      class="flex flex-col gap-4 mx-4 w-full max-w-2xl bg-[#0D0D0D] p-4 rounded-xl border border-[#404040] shadow-lg"
     >
+      <div class="flex w-full justify-between pb-2">
+        <h1 class="text-xl text-[#DFDD00]">Chat Settings</h1>
+        <CircleX
+          class="cursor-pointer transition-all duration-150 ease-in-out hover:stroke-red-500"
+          @click="toggleCommandBar"
+          size="20"
+        />
+      </div>
       <div class="flex justify-between text-[#A2A2A2]">
         Auto send mic input
         <Toggle @toggled="autoSend" />
       </div>
 
-      <div class="w-full flex justify-center">
+      <!-- <CommandBarListInput
+        text="Username"
+        type="text"
+        keyName="username"
+        default="You"
+      /> -->
+
+      <div class="w-full flex justify-center" @click="closeChat">
         <div
-          class="flex items-center border p-1 px-4 gap-2 rounded-full border-red-500 hover:bg-red-500 transition-all duration-300 ease-in-out cursor-pointer"
-          @click="closeChat"
+          class="transition-all duration-300 ease-in-out flex items-center gap-2 bg-red-400 p-1 rounded cursor-pointer hover:bg-red-500 p-2 mt-4 justify-center"
         >
-          Close Chat <X size="18" />
+          Close Chat <LogOut size="20"/>
         </div>
       </div>
     </div>
@@ -29,11 +43,12 @@
 </template>
 
 <script setup>
-import { X } from "lucide-vue-next";
+import { CircleX, LogOut } from "lucide-vue-next";
 </script>
 
 <script>
 import Toggle from "./Toggle.vue";
+import CommandBarListInput from "./CommandBarListInput.vue";
 export default {
   name: "ChatSettings",
   props: {
@@ -42,6 +57,7 @@ export default {
     chatParams: Object,
   },
   components: {
+    CommandBarListInput,
     Toggle,
   },
   methods: {

@@ -11,7 +11,7 @@
       <ChatHeader
         :callStats="{ formattedTime, timeTaken, messageLength }"
         initialName="ChatGPT"
-        initialModel="GPT-4"
+        :initialModel="currentModel"
         @toggleSettings="toggleSettings"
       />
       <!-- Box containing messages -->
@@ -22,7 +22,7 @@
         </div>
         <div class="w-full">
           <MessageBox
-            :submitEvent="onSubmit"
+            @chat-submission="onSubmit"
             :autoSendMicInput="autoSendMicInput"
           />
         </div>
@@ -33,11 +33,11 @@
 
 <script>
 import ChatBox from "./ChatBox.vue";
-import ChatGPTMessage from "./ChatGPTMessage.vue";
+import ChatGPTMessage from "./Message.vue";
 import MessageBox from "./MessageBox.vue";
-import getStats from "../utils/stats";
 import ChatHeader from "./ChatHeader.vue";
 import ChatSettings from "./ChatSettings.vue";
+import newMessage from "../utils/newMessage";
 
 export default {
   name: "ChatGPT",
@@ -55,7 +55,7 @@ export default {
 
   methods: {
     onSubmit(message) {
-      this.chatSubmission(message, "user");
+      this.chatSubmission(message);
       this.callToApi();
     },
 
@@ -71,12 +71,8 @@ export default {
       this.settingsActive = !this.settingsActive;
     },
 
-    chatSubmission(message, user) {
-      this.messages.push({
-        id: this.messages.length + 1,
-        message: message,
-        sender: user,
-      });
+    chatSubmission(message) {
+      this.messages.push(newMessage(message));
       // Store in local storage
       localStorage.setItem(this.chatParams.id, JSON.stringify(this.messages));
       this.scrollToBottom();
@@ -117,16 +113,23 @@ export default {
         );
         const data = await response.json();
         const end = performance.now(); // End timing after response
-        const { timeTaken, messageLength, formattedTime } = getStats({
+        // const { timeTaken, messageLength, formattedTime } = getStats({
+        //   start,
+        //   end,
+        //   assistant: "ChatGPT",
+        //   message: data.choices[0].message.content,
+        // });
+
+        const latestMessage = newMessage({
+          message: data.choices[0].message.content,
+          sender: "ai-chatgpt",
           start,
           end,
-          assistant: "ChatGPT",
-          message: data.choices[0].message.content,
         });
-        this.chatSubmission(data.choices[0].message.content, "ai-chatgpt");
-        this.timeTaken = timeTaken;
-        this.messageLength = messageLength;
-        this.formattedTime = formattedTime;
+        this.chatSubmission(latestMessage);
+        this.timeTaken = latestMessage.timeTaken;
+        this.messageLength = latestMessage.messageLength;
+        this.formattedTime = latestMessage.formattedTime;
       } catch (error) {
         console.error(error);
       }
@@ -140,10 +143,16 @@ export default {
   data() {
     return {
       messages: JSON.parse(localStorage.getItem(`${this.chatParams.id}`)) || [],
-      currentModel: this.chatParams.model ?? "gpt-4-turbo",
+      currentModel: this.chatParams.model ?? "gpt-4o",
       modelLegend: {
         "gpt-4": "gpt-4-turbo",
         "gpt-3": "gpt-3-turbo",
+        "gpt-4o": "gpt-4o",
+      },
+      modelNameLegend: {
+        "gpt-4": "Chat GPT-4",
+        "gpt-3": "Chat GPT-3",
+        "gpt-4o": "Chat GPT-4 Omega",
       },
       timeTaken: 0,
       messageLength: 0,
@@ -158,14 +167,14 @@ export default {
   watch: {
     query: {
       handler(newVal) {
-        this.onSubmit(newVal);
+        this.onSubmit(newMessage({ message: newVal }));
       },
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
 .no-scrollbar::-webkit-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;

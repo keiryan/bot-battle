@@ -1,19 +1,18 @@
 <template>
-  <div className="w-screen h-screen flex overflow-hidden">
-    <ChatGPT
-      :query="this.query"
-      v-for="chat in gptChats"
-      :chatParams="chat"
-      @chat-closed="handleChatClosed"
-    />
-    <!-- Visual divider -->
-    <!-- <div class="w-2 h-full bg-black" /> -->
-    <Gemini
-      :query="this.query"
-      v-for="chat in geminiChats"
-      :chatParams="chat"
-      @chat-closed="handleChatClosed"
-    />
+  <div class="w-screen h-screen flex overflow-hidden">
+    <template v-for="(chat, index) in allChats" :key="chat.id">
+      <component
+        :is="chat.type === 'gemini' ? 'Gemini' : 'ChatGPT'"
+        :query="query"
+        :chatParams="chat"
+        @chat-closed="handleChatClosed"
+      />
+      <!-- Visual divider -->
+      <div
+        v-if="index < allChats.length - 1"
+        class="w-1.5 h-full bg-black"
+      />
+    </template>
 
     <NewChat @addChat="addChat" :totalChats="totalChats" />
 
@@ -98,6 +97,12 @@ export default {
     },
   },
 
+  computed: {
+    allChats() {
+      return [...this.geminiChats, ...this.gptChats];
+    },
+  },
+
   data() {
     return {
       commandBarActive: false,
@@ -110,4 +115,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Add any specific styles here if needed */
+</style>

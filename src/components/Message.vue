@@ -25,9 +25,8 @@
 </template>
 
 <script>
-import ChatGPTIcon from "./ChatGPTIcon.vue";
-import ProfileIcon from "./ProfileIcon.vue";
 import MessageIconArray from "./MessageIconArray.vue";
+import ProfileIcon from "./ProfileIcon.vue";
 import { marked } from "marked";
 
 marked.setOptions({
@@ -47,7 +46,6 @@ export default {
   },
 
   components: {
-    ChatGPTIcon,
     ProfileIcon,
     MessageIconArray,
   },
@@ -62,7 +60,7 @@ export default {
     return {
       senderLegend: {
         user: localStorage.getItem("username"),
-        'ai-chatgpt': "ChatGPT",
+        "ai-chatgpt": "ChatGPT",
         gemini: "Gemini",
       },
     };
